@@ -44,7 +44,7 @@ echo "Prepare to use"
 unzip v2ray.zip && chmod +x v2ray
 mv v2ray /usr/bin/
 mv geosite.dat geoip.dat /usr/local/share/v2ray/
-# mv config.json /etc/v2ray/config.json
+mv config.json /etc/v2ray/config.json
 
 # Set config file
 cat <<EOF >/etc/v2ray/config.json
@@ -91,4 +91,4 @@ echo "V2Ray UUID: ${UUID}"
 echo "--------------------------------"
 
 # Run v2ray
-/usr/bin/v2ray -config=/etc/v2ray/config.json
+/usr/bin/v2ray run -c /etc/v2ray/config.json
