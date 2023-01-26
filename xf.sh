@@ -36,6 +36,8 @@ STR=$(cat < v2ray.zip.dgst | grep 'SHA512' | head -n1)
 if [ "${LOCAL}" = "${STR}" ]; then
     echo " Check passed" && rm -fv v2ray.zip.dgst
 else
+    echo $LOCAL
+    echo $STR
     echo " Check have not passed yet " && exit 1
 fi
 
