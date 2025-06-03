@@ -1,0 +1,55 @@
+log:
+  level: info
+  file: ""
+
+api:
+  http: "" # 在该地址启动 api 接口。
+
+include: []
+
+plugins:
+# 上游dns
+  - tag: google
+    type: forward
+    args:
+      concurrent: 2
+      upstreams:
+        - addr: "https://dns.google/dns-query"
+          dial_addr: "8.8.8.8"
+          enable_pipeline: true
+          
+        - addr: https://1.1.1.1/dns-query
+          enable_pipeline: true
+
+#主分流序列
+  - tag: sequence_main
+    type: sequence
+    args:
+      - exec: $google
+      - exec: accept
+
+
+
+#DNS服务器
+  - tag: udp_all
+    type: udp_server
+    args:
+      entry: sequence_main
+      listen: ":5353"
+
+  - tag: tcp_all
+    type: tcp_server
+    args:
+      entry: sequence_main
+      listen: ":5353"
+      idle_timeout: 720
+
+  - tag: ""
+    type: "http_server"
+    args:
+      entries:                 # []extry
+        - path: /dns-query     # 本路径执行   
+          exec: sequence_main # 可执行插件的 tag。  
+      src_ip_header: "X-Forwarded-For"  # 从 HTTP 头获取用户 IP。
+      listen: 0.0.0.0:80  # 监听地址。
+      idle_timeout: 10       # 空连接超时。单位秒。默认 30。
